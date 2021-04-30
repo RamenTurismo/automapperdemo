@@ -18,20 +18,16 @@ namespace AutoMapperDemo.Tests
     /// <summary>
     /// https://docs.automapper.org/en/stable/Queryable-Extensions.html
     /// </summary>
-    public class EfCoreLazyLoading : IDisposable
+    public class EfCoreLazyLoading : TestBase
     {
-        private static readonly Random Random = new();
         private readonly MyDbContext _demoDbContext;
-        private readonly ILoggerFactory _loggerFactory;
         private readonly IMapper _mapper;
 
-        public EfCoreLazyLoading(ITestOutputHelper testOutputHelper)
+        public EfCoreLazyLoading(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _loggerFactory = LoggingHelper.CreateLoggerFactory(testOutputHelper);
-
             _demoDbContext = EfCoreHelper.CreateDbContext<MyDbContext>(configure =>
             {
-                configure.UseLoggerFactory(_loggerFactory);
+                configure.UseLoggerFactory(LoggerFactory);
                 configure.UseLazyLoadingProxies();
             });
 
@@ -94,10 +90,11 @@ namespace AutoMapperDemo.Tests
         }
 
         /// <inheritdoc />
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
+
             _demoDbContext.Dispose();
-            _loggerFactory.Dispose();
         }
 
         public class MyDbContext : DbContext
